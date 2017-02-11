@@ -43,7 +43,7 @@ cd $ORACLE_HOME/bin
 if ! relink all; then
 	echo "Relink all failed"
 	cat $ORACLE_HOME/install/relink.log
-	echo "Continuing anyway..."
+	exit 1
 fi
 
 # Cleanup

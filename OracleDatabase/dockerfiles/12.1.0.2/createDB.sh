@@ -11,7 +11,8 @@
 # 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
-
+set -e
+set -x
 
 ORACLE_SID=$1
 # Check whether ORACLE_SID is passed on
@@ -52,10 +53,12 @@ echo "LISTENER =
 " > $ORACLE_HOME/network/admin/listener.ora
 
 # Start LISTENER and run DBCA
-lsnrctl start &&
-dbca -silent -responseFile $ORACLE_BASE/dbca.rsp ||
- cat /opt/oracle/cfgtoollogs/dbca/$ORACLE_SID/$ORACLE_SID.log ||
- cat /opt/oracle/cfgtoollogs/dbca/$ORACLE_SID.log
+lsnrctl start
+if ! dbca -silent -responseFile $ORACLE_BASE/dbca.rsp; then
+  echo "ERROR: dbca failed"
+  cat /opt/oracle/cfgtoollogs/dbca/$ORACLE_SID/$ORACLE_SID.log
+  cat /opt/oracle/cfgtoollogs/dbca/$ORACLE_SID.log
+fi
 
 echo "$ORACLE_SID=localhost:1521/$ORACLE_SID" >> $ORACLE_HOME/network/admin/tnsnames.ora
 echo "$ORACLE_PDB= 

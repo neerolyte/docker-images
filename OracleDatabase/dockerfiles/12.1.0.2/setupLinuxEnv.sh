@@ -10,18 +10,21 @@
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
 
+set -x
+set -e
+
 # Setup filesystem and oracle user
 # Adjust file permissions, go to /opt/oracle as user 'oracle' to proceed with Oracle installation
 # ------------------------------------------------------------
-mkdir -p $ORACLE_BASE/oradata && \
-chmod ug+x $ORACLE_BASE/$PWD_FILE && \
-chmod ug+x $ORACLE_BASE/$RUN_FILE && \
-chmod ug+x $ORACLE_BASE/$START_FILE && \
-chmod ug+x $ORACLE_BASE/$CREATE_DB_FILE && \
-groupadd -g 500 dba && \
-groupadd -g 501 oinstall && \
-useradd  -u 500 -d /home/oracle -g dba -G dba,oinstall -m -s /bin/bash oracle && \
-echo oracle:oracle | chpasswd && \
-yum -y install oracle-rdbms-server-12cR1-preinstall unzip wget tar openssl && \
-yum clean all && \
+mkdir -p $ORACLE_BASE/oradata
+chmod ug+x $ORACLE_BASE/$PWD_FILE
+chmod ug+x $ORACLE_BASE/$RUN_FILE
+chmod ug+x $ORACLE_BASE/$START_FILE
+chmod ug+x $ORACLE_BASE/$CREATE_DB_FILE
+groupadd -g 500 dba
+groupadd -g 501 oinstall
+useradd  -u 500 -d /home/oracle -g dba -G dba,oinstall -m -s /bin/bash oracle
+echo oracle:oracle | chpasswd
+yum -y install oracle-rdbms-server-12cR1-preinstall unzip wget tar openssl
+# yum clean all
 chown -R oracle:dba $ORACLE_BASE

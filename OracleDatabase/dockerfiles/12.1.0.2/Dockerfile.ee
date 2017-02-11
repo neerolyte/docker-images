@@ -52,7 +52,11 @@ ENV INSTALL_DIR=$ORACLE_BASE/install \
 
 # Copy binaries
 # -------------
-COPY $INSTALL_FILE_1 $INSTALL_FILE_2 $INSTALL_RSP $PERL_INSTALL_FILE $SETUP_LINUX_FILE $CHECK_SPACE_FILE $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
+# Copy the large zips first (they won't change when we change scripts so we can
+# cache the build this way)
+COPY $INSTALL_FILE_1 $INSTALL_FILE_2 $INSTALL_DIR/
+# Copy all the smaller stuff now.
+COPY $INSTALL_RSP $PERL_INSTALL_FILE $SETUP_LINUX_FILE $CHECK_SPACE_FILE $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
 COPY $RUN_FILE $START_FILE $CREATE_DB_FILE $CONFIG_RSP $PWD_FILE $ORACLE_BASE/
 
 # Share yum cache between builds when building with rocker:
@@ -73,13 +77,16 @@ RUN $ORACLE_BASE/oraInventory/orainstRoot.sh && \
     $ORACLE_HOME/root.sh && \
     rm -rf $INSTALL_DIR
 
+# so I can debug dbca a bit more
+RUN yum install -y strace lsof
+
 USER oracle
 WORKDIR /home/oracle
 
 # Because volume's are slow and flakey...
 #VOLUME ["$ORACLE_BASE/oradata"]
 EXPOSE 1521 5500
-    
+
 # Define default command to start Oracle Database. 
 CMD $ORACLE_BASE/$RUN_FILE
 

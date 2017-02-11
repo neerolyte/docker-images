@@ -9,6 +9,7 @@
 # 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
+set -ex
 
 ########### Move DB files ############
 function moveFiles {

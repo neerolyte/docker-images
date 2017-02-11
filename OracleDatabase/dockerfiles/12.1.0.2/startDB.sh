@@ -10,7 +10,7 @@
 # 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
-
+set -ex
 # Check that ORACLE_HOME is set
 if [ "$ORACLE_HOME" == "" ]; then
   script_name=`basename "$0"`

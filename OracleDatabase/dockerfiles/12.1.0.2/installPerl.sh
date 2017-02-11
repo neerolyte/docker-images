@@ -10,12 +10,16 @@
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
 
+set -e
+set -x
 
 # Install latest Perl
 cd $INSTALL_DIR
 mv $ORACLE_HOME/perl $ORACLE_HOME/perl.old
-wget http://www.cpan.org/src/5.0/perl-5.14.1.tar.gz
-tar -xzf perl-5.14.1.tar.gz
+# yes, i'm aware this doesn't belong in /var/cache/yum - but i have persistent
+# cache set up there.
+wget http://www.cpan.org/src/5.0/perl-5.14.1.tar.gz -c -O /var/cache/yum/perl-5.14.1.tar.gz
+tar -xzf /var/cache/yum/perl-5.14.1.tar.gz
 cd perl-5.14.1
 ./Configure -des -Dprefix=$ORACLE_HOME/perl -Doptimize=-O3 -Dusethreads -Duseithreads -Duserelocatableinc
 make clean
@@ -36,7 +40,11 @@ ln -sf ../javavm/jdk/jdk7/lib/libjavavm12.a
 
 # Relink Oracle
 cd $ORACLE_HOME/bin
-relink all
+if ! relink all; then
+	echo "Relink all failed"
+	cat $ORACLE_HOME/install/relink.log
+	echo "Continuing anyway..."
+fi
 
 # Cleanup
 rm -rf $ORACLE_HOME/perl.old

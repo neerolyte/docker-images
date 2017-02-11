@@ -151,10 +151,18 @@ echo "Building image '$IMAGE_NAME' ..."
 
 # BUILD THE IMAGE (replace all environment variables)
 BUILD_START=$(date '+%s')
-docker build --force-rm=true --no-cache=true $DOCKEROPS $PROXY_SETTINGS -t $IMAGE_NAME -f Dockerfile.$EDITION . || {
+if ! which rocker; then
+  docker build --force-rm=true --no-cache=true $DOCKEROPS $PROXY_SETTINGS -t $IMAGE_NAME -f Dockerfile.$EDITION .
+  status=$?
+else
+  sed 's/^# ROCKER: //' "Dockerfile.$EDITION" | sed "s|%%IMAGE_NAME%%|$IMAGE_NAME|g" > Rockerfile."$EDITION"
+  rocker build -f "Rockerfile.$EDITION"
+  status=$?
+fi
+if [[ "$status" != "$?" ]]; then
   echo "There was an error building the image."
   exit 1
-}
+fi
 BUILD_END=$(date '+%s')
 BUILD_ELAPSED=`expr $BUILD_END - $BUILD_START`
 

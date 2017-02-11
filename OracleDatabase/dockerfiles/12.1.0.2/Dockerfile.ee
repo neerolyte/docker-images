@@ -55,6 +55,10 @@ ENV INSTALL_DIR=$ORACLE_BASE/install \
 COPY $INSTALL_FILE_1 $INSTALL_FILE_2 $INSTALL_RSP $PERL_INSTALL_FILE $SETUP_LINUX_FILE $CHECK_SPACE_FILE $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
 COPY $RUN_FILE $START_FILE $CREATE_DB_FILE $CONFIG_RSP $PWD_FILE $ORACLE_BASE/
 
+# Share yum cache between builds when building with rocker:
+# ROCKER: MOUNT ../../.cache/yum:/var/cache/yum
+# ROCKER: RUN ["sed", "-i", "s/keepcache=0/keepcache=1/", "/etc/yum.conf"]
+
 RUN chmod ug+x $INSTALL_DIR/*.sh && \
     sync && \
     $INSTALL_DIR/$CHECK_SPACE_FILE && \
@@ -72,8 +76,12 @@ RUN $ORACLE_BASE/oraInventory/orainstRoot.sh && \
 USER oracle
 WORKDIR /home/oracle
 
-VOLUME ["$ORACLE_BASE/oradata"]
+# Because volume's are slow and flakey...
+#VOLUME ["$ORACLE_BASE/oradata"]
 EXPOSE 1521 5500
     
 # Define default command to start Oracle Database. 
 CMD $ORACLE_BASE/$RUN_FILE
+
+# ROCKER: TAG %%IMAGE_NAME%%
+
